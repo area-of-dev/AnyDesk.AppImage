@@ -1,4 +1,3 @@
-#! /bin/bash
 # Copyright 2020 Alex Woroschilow (alex.woroschilow@gmail.com)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -10,20 +9,15 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-set -ex
+FROM ubuntu:20.04
 
-PATH=${PATH}:${APPDIR}/bin
-PATH=${PATH}:${APPDIR}/anydesk
-export PATH=${PATH}
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${APPDIR}/lib
-LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${APPDIR}/anydesk
-LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${APPDIR}/lib64
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
+RUN apt-get -y update && apt-get -y install apt-utils gnupg
+RUN apt-get -y update && apt-get -y upgrade
+RUN apt-get install -y kmod make gcc wget
+RUN apt-get install -y rpm2cpio cpio fuse file
+RUN wget -qO - https://packagecloud.io/AtomEditor/atom/gpgkey | apt-key add
+RUN sh -c 'echo "deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main" > /etc/apt/sources.list.d/atom.list'
+RUN apt-get update
 
-XDG_DATA_DIRS=${XDG_DATA_DIRS}:${APPDIR}/share
-export XDG_DATA_DIRS=${XDG_DATA_DIRS}
-
-cd ${OWD}
-
-${APPDIR}/anydesk/anydesk $@
